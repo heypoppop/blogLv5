@@ -4,6 +4,7 @@ import com.sparta.blog.dto.BoardRequestDto;
 import com.sparta.blog.dto.BoardResponseDto;
 import com.sparta.blog.entity.Board;
 import com.sparta.blog.entity.User;
+import com.sparta.blog.entity.UserRoleEnum;
 import com.sparta.blog.repository.BoardRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,7 @@ public class BoardService {
     //생성
     public BoardResponseDto createBoard(BoardRequestDto boardRequestDto, User user) {
         Board board = boardRepository.save(new Board(boardRequestDto, user));
+        System.out.println(user.getRole());
         return new BoardResponseDto(board);
     }
 
@@ -42,6 +44,13 @@ public class BoardService {
     @Transactional
     public ResponseEntity<String> updateBoard(Long id, BoardRequestDto boardRequestDto, User user) {
         Board board = findBoard(id);
+
+        // 어드민 체크
+        if (user.getRole() == UserRoleEnum.ADMIN) {
+            board.update(boardRequestDto, user);
+            return ResponseEntity.status(200).body("상태코드 : " + HttpStatus.OK.value() + " 메세지 : 관리자 권한 게시물 삭제 성공"); }
+
+        // 일반 유저일 때
         if (!board.getUser().getUsername().equals(user.getUsername())) {
             return ResponseEntity.status(400).body("상태코드 : " + HttpStatus.BAD_REQUEST.value()  + " 메세지 : 선생님 게시물이 아닙니다.");}
         board.update(boardRequestDto, user);
@@ -51,6 +60,12 @@ public class BoardService {
     // 삭제
     public ResponseEntity<String> deleteBoard(Long id, User user) {
         Board board = findBoard(id);
+
+        // 어드민 체크
+        if (user.getRole() == UserRoleEnum.ADMIN) {
+            boardRepository.delete(board);
+            return ResponseEntity.status(200).body("상태코드 : " + HttpStatus.OK.value() + " 메세지 : 관리자 권한 게시물 수정 성공"); }
+
         if(!board.getUser().getUsername().equals(user.getUsername())) {
             return ResponseEntity.status(400).body("상태코드 : " + HttpStatus.BAD_REQUEST.value() + " 메세지 : 선생님 게시물이 아닙니다.");}
         boardRepository.delete(board);

@@ -5,6 +5,7 @@ import com.sparta.blog.dto.CommentRequestDto;
 import com.sparta.blog.entity.Board;
 import com.sparta.blog.entity.Comment;
 import com.sparta.blog.entity.User;
+import com.sparta.blog.entity.UserRoleEnum;
 import com.sparta.blog.repository.BoardRepository;
 import com.sparta.blog.repository.CommentRepository;
 import com.sparta.blog.repository.UserRepository;
@@ -32,6 +33,11 @@ public class CommentService {
     @Transactional
     public ResponseEntity<String> updateComment(Long id, CommentRequestDto commentRequestDto, User user) {
         Comment comment = findComment(id);
+        // 어드민 체크
+        if (user.getRole() == UserRoleEnum.ADMIN) {
+            comment.update(commentRequestDto, user);
+            return ResponseEntity.status(200).body("상태코드 : " + HttpStatus.OK.value() + " 메세지 : 관리자 권한 댓글 수정 성공"); }
+
         if (!comment.getUser().getUsername().equals(user.getUsername())) {
             return ResponseEntity.status(400).body("상태코드 : " + HttpStatus.BAD_REQUEST.value()  + " 메세지 : 선생님 댓글이 아닙니다.");}
         comment.update(commentRequestDto, user);
@@ -42,6 +48,12 @@ public class CommentService {
     // 삭제
     public ResponseEntity<String> deleteComment(Long id, User user) {
         Comment comment = findComment(id);
+
+        // 어드민 체크
+        if (user.getRole() == UserRoleEnum.ADMIN) {
+            commentRepository.delete(comment);
+            return ResponseEntity.status(200).body("상태코드 : " + HttpStatus.OK.value() + " 메세지 : 관리자 권한 게시물 수정 성공"); }
+
         if(!comment.getUser().getUsername().equals(user.getUsername())) {
             return ResponseEntity.status(400).body("상태코드 : " + HttpStatus.BAD_REQUEST.value() + " 메세지 : 선생님 댓글이 아닙니다.");}
         commentRepository.delete(comment);
