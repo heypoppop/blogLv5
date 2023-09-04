@@ -5,13 +5,11 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.net.URLEncoder;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
@@ -26,7 +24,7 @@ public class JwtUtil {
     // Token 식별자
     public static final String BEARER_PREFIX = "Bearer ";
     // 토큰 만료시간
-    private final long TOKEN_TIME = 60 * 60 * 1000L; // 60분
+    private final long TOKEN_TIME = 60 * 60 * 24 * 1000L; // 24시간
 
     @Value("${jwt.secret.key}") // Base64 Encode 한 SecretKey
     private String secretKey;
@@ -57,11 +55,6 @@ public class JwtUtil {
 //        token = URLEncoder.encode(token, "UTF-8").replace("\\+", "%20");
 //        response.addHeader(AUTHORIZATION_HEADER, token);
 //    }
-
-
-
-
-
 
     // header 에서 JWT 가져오기
     public String getJwtFromHeader(HttpServletRequest request) {

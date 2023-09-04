@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -20,15 +23,21 @@ public class Board extends Timestamped{
     @Column(name = "title")
     private String title;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+
+    @ManyToOne()
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
+    private List<Comment> commentsList;
+
 
     public Board(BoardRequestDto boardrequestDto, User user) {
         this.contents = boardrequestDto.getContents();
         this.title = boardrequestDto.getTitle();
         this.user = user;
     }
+
 
     public void update(BoardRequestDto boardrequestDto, User user) {
         this.contents = boardrequestDto.getContents();
