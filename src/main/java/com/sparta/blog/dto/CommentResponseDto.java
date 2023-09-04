@@ -13,6 +13,5 @@ public class CommentResponseDto {
         this.id = comment.getId();
         this.comment = comment.getComment();
         this.username = comment.getUser().getUsername();
-
     }
 }

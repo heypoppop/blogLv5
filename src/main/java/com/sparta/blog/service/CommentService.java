@@ -22,20 +22,30 @@ public class CommentService {
     private final UserRepository userRepository;
 
 
+    // 댓글 작성
     public ResponseEntity<String> createComment(Long id, CommentRequestDto commentRequestDto, User user) {
         Board board = findBoard(id);
         commentRepository.save(new Comment(commentRequestDto, user, board));
-        return ResponseEntity.status(200).body("상태코드 : " + HttpStatus.OK.value() + " 메세지 : 게시물 생성 성공");
+        return ResponseEntity.status(200).body("상태코드 : " + HttpStatus.OK.value() + " 메세지 : 댓글 생성 성공");}
 
-    }
-
+    // 수정
     @Transactional
     public ResponseEntity<String> updateComment(Long id, CommentRequestDto commentRequestDto, User user) {
         Comment comment = findComment(id);
         if (!comment.getUser().getUsername().equals(user.getUsername())) {
-            return ResponseEntity.status(400).body("상태코드 : " + HttpStatus.BAD_REQUEST.value()  + " 메세지 : 선생님 게시물이 아닙니다.");}
+            return ResponseEntity.status(400).body("상태코드 : " + HttpStatus.BAD_REQUEST.value()  + " 메세지 : 선생님 댓글이 아닙니다.");}
         comment.update(commentRequestDto, user);
-        return ResponseEntity.status(200).body("상태코드 : " + HttpStatus.OK.value() + " 메세지 : 게시물 수정 성공");
+        return ResponseEntity.status(200).body("상태코드 : " + HttpStatus.OK.value() + " 메세지 : 댓글 수정 성공");
+    }
+
+
+    // 삭제
+    public ResponseEntity<String> deleteComment(Long id, User user) {
+        Comment comment = findComment(id);
+        if(!comment.getUser().getUsername().equals(user.getUsername())) {
+            return ResponseEntity.status(400).body("상태코드 : " + HttpStatus.BAD_REQUEST.value() + " 메세지 : 선생님 댓글이 아닙니다.");}
+        commentRepository.delete(comment);
+        return ResponseEntity.status(200).body("상태코드 : " + HttpStatus.OK.value() + " 메세지 : 댓글 삭제 성공");
     }
 
     // DB에서 찾기

@@ -49,7 +49,7 @@ public class BoardService {
     }
 
     // 삭제
-    public ResponseEntity<String> deleteBoard(Long id, User user) throws IllegalArgumentException {
+    public ResponseEntity<String> deleteBoard(Long id, User user) {
         Board board = findBoard(id);
         if(!board.getUser().getUsername().equals(user.getUsername())) {
             return ResponseEntity.status(400).body("상태코드 : " + HttpStatus.BAD_REQUEST.value() + " 메세지 : 선생님 게시물이 아닙니다.");}
