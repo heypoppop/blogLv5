@@ -1,7 +1,6 @@
 package com.sparta.blog.controller;
 
 import com.sparta.blog.dto.CommentRequestDto;
-import com.sparta.blog.entity.Board;
 import com.sparta.blog.security.UserDetailsImpl;
 import com.sparta.blog.service.CommentService;
 import org.springframework.http.ResponseEntity;

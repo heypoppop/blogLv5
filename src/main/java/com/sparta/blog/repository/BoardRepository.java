@@ -1,6 +1,5 @@
 package com.sparta.blog.repository;
 
-import com.sparta.blog.dto.BoardResponseDto;
 import com.sparta.blog.entity.Board;
 import com.sparta.blog.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;

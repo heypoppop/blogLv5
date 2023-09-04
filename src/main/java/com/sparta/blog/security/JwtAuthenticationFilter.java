@@ -54,7 +54,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         response.setContentType("text/plain");
         response.setCharacterEncoding("UTF-8");
         String massage = "로그인 성공";
-        response.getWriter().write("상태코드 : " + response.getStatus() +", 메세지 : " +  massage);
+        response.getWriter().write("상태코드 : " + response.getStatus() + ", 메세지 : " + massage);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         response.setCharacterEncoding("UTF-8");
         response.setContentType("text/plain");
         response.setStatus(401);
-        response.getWriter().write("상태코드 : " + response.getStatus() +", 메세지 : " + errorMessage);
+        response.getWriter().write("상태코드 : " + response.getStatus() + ", 메세지 : " + errorMessage);
 
 
     }
