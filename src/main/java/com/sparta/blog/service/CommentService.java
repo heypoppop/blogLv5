@@ -31,7 +31,7 @@ public class CommentService {
     public ResponseEntity<String> updateComment(Long id, CommentRequestDto commentRequestDto, User user) {
         Comment comment = findComment(id);
         // 어드민 체크
-        if (user.getRole() == UserRoleEnum.ADMIN) {
+        if (user.getRole().equals(UserRoleEnum.ADMIN)) {
             comment.update(commentRequestDto, user);
             return ResponseEntity.status(200).body("상태코드 : " + HttpStatus.OK.value() + " 메세지 : 관리자 권한 댓글 수정 성공"); }
 
@@ -46,7 +46,7 @@ public class CommentService {
         Comment comment = findComment(id);
 
         // 어드민 체크
-        if (user.getRole() == UserRoleEnum.ADMIN) {
+        if (user.getRole().equals(UserRoleEnum.ADMIN)) {
             commentRepository.delete(comment);
             return ResponseEntity.status(200).body("상태코드 : " + HttpStatus.OK.value() + " 메세지 : 관리자 권한 게시물 수정 성공"); }
 
@@ -59,4 +59,7 @@ public class CommentService {
     private Comment findComment(Long id) {
         return commentRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("선택한 게시글이 없습니다."));
     }
+
+
+
 }
