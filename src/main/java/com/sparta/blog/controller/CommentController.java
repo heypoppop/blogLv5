@@ -15,9 +15,9 @@ public class CommentController {
     public CommentController(CommentService commentService) {this.commentService = commentService;}
 
     // 댓글 작성
-    @PostMapping("/comment/{id}")
-    public ResponseEntity<String> createComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return commentService.createComment(id, commentRequestDto, userDetails.getUser());
+    @PostMapping("/comment")
+    public ResponseEntity<String> createComment(@RequestBody CommentRequestDto commentRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return commentService.createComment(commentRequestDto, userDetails.getUser());
     }
 
     // 댓글 수정
