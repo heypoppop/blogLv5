@@ -17,7 +17,7 @@ public class BoardResponseDto {
     private String contents;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
-    private int likeCount;
+    private Integer likeCount;
     private List<CommentResponseDto> commentList = new ArrayList<>();
 
 
