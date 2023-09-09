@@ -62,6 +62,19 @@ public class CommentService {
 
     }
 
+
+    public ResponseEntity<MessageResponseDto> likeComment(Long id, User user) {
+        Comment comment = findComment(id);
+        Optional<Like> like = likeRepository.findByUserIdAndBoardId(user.getId(), id);
+        if (like.isEmpty()) {
+            likeRepository.save(new Like(user, comment.getBoard(), comment));
+            MessageResponseDto message = new MessageResponseDto(HttpStatus.OK.value(), " 게시물 좋아요 성공" );
+            return ResponseEntity.status(200).body(message);
+        }
+        likeRepository.delete(like.get());
+        return ResponseEntity.status(200).body(new MessageResponseDto(HttpStatus.OK.value(), " 게시물 좋아요 취소" ));
+    }
+
     // DB에서 찾기
     private Comment findComment(Long id) {
         return commentRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_COMMENT));

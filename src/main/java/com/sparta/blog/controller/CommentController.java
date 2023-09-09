@@ -34,9 +34,9 @@ public class CommentController {
         return commentService.deleteComment(id, userDetails.getUser());
     }
 
-//    // 좋아요
-//    @PutMapping("/comment/{id}/like")
-//    public ResponseEntity<MessageResponseDto> likeBoard(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-//        return commentService.likeComment(id, userDetails.getUser());
-//    }
+    // 좋아요
+    @PutMapping("/comment/{id}/like")
+    public ResponseEntity<MessageResponseDto> likeBoard(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return commentService.likeComment(id, userDetails.getUser());
+    }
 }
