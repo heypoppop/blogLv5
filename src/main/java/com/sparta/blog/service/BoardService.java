@@ -2,25 +2,31 @@ package com.sparta.blog.service;
 
 import com.sparta.blog.dto.BoardRequestDto;
 import com.sparta.blog.dto.BoardResponseDto;
+import com.sparta.blog.dto.MessageResponseDto;
 import com.sparta.blog.entity.Board;
+import com.sparta.blog.entity.Like;
 import com.sparta.blog.entity.User;
 import com.sparta.blog.entity.UserRoleEnum;
+import com.sparta.blog.exception.CustomException;
+import com.sparta.blog.exception.ErrorCode;
 import com.sparta.blog.repository.BoardRepository;
+import com.sparta.blog.repository.LikeRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
+@RequiredArgsConstructor
 @Service
 public class BoardService {
 
     private final BoardRepository boardRepository;
+    private final LikeRepository likeRepository;
 
-    public BoardService(BoardRepository boardRepository) {
-        this.boardRepository = boardRepository;
-    }
 
     // 전체 조회
     public List<BoardResponseDto> getBoard() {
@@ -35,44 +41,56 @@ public class BoardService {
 
     // 게시물 id로 조회
     public BoardResponseDto getBoardById(Long id) {
-        Board board = boardRepository.findBoardById(id).orElseThrow(() -> new RuntimeException("게시물이 존재하지 않습니다"));
+        Board board = boardRepository.findBoardById(id).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_BOARD));
         return new BoardResponseDto(board);
     }
 
     // 수정
     @Transactional
-    public ResponseEntity<String> updateBoard(Long id, BoardRequestDto boardRequestDto, User user) {
+    public ResponseEntity<MessageResponseDto> updateBoard(Long id, BoardRequestDto boardRequestDto, User user) {
         Board board = findBoard(id);
-
-        // 어드민 체크
-        if (user.getRole().equals(UserRoleEnum.ADMIN)) {
+        // 어드민 or 작성자 체크
+        if (user.getRole().equals(UserRoleEnum.ADMIN) || board.getUser().getUsername().equals(user.getUsername())) {
             board.update(boardRequestDto, user);
-            return ResponseEntity.status(200).body("상태코드 : " + HttpStatus.OK.value() + " 메세지 : 관리자 권한 게시물 삭제 성공"); }
+            MessageResponseDto message = new MessageResponseDto(HttpStatus.OK.value(), " 게시물 수정 성공" );
+            return ResponseEntity.status(200).body(message);}
 
-        // 일반 유저일 때
-        if (!board.getUser().getUsername().equals(user.getUsername())) {
-            return ResponseEntity.status(400).body("상태코드 : " + HttpStatus.BAD_REQUEST.value()  + " 메세지 : 선생님 게시물이 아닙니다.");}
-        board.update(boardRequestDto, user);
-        return ResponseEntity.status(200).body("상태코드 : " + HttpStatus.OK.value() + " 메세지 : 게시물 삭제 성공");
+        throw new CustomException(ErrorCode.NOT_USER_COMMENT);
+
     }
 
+
     // 삭제
-    public ResponseEntity<String> deleteBoard(Long id, User user) {
+    public ResponseEntity<MessageResponseDto> deleteBoard(Long id, User user) {
         Board board = findBoard(id);
 
-        // 어드민 체크
-        if (user.getRole().equals(UserRoleEnum.ADMIN)) {
+        // 어드민 or 작성자 체크
+        if (user.getRole().equals(UserRoleEnum.ADMIN) || board.getUser().getUsername().equals(user.getUsername())) {
             boardRepository.delete(board);
-            return ResponseEntity.status(200).body("상태코드 : " + HttpStatus.OK.value() + " 메세지 : 관리자 권한 게시물 수정 성공"); }
+            MessageResponseDto message = new MessageResponseDto(HttpStatus.OK.value(), " 게시물 수정 성공" );
+            return ResponseEntity.status(200).body(message);}
 
-        if(!board.getUser().getUsername().equals(user.getUsername())) {
-            return ResponseEntity.status(400).body("상태코드 : " + HttpStatus.BAD_REQUEST.value() + " 메세지 : 선생님 게시물이 아닙니다.");}
-        boardRepository.delete(board);
-        return ResponseEntity.status(200).body("상태코드 : " + HttpStatus.OK.value() + " 메세지 : 게시물 삭제 성공");
+        throw new CustomException(ErrorCode.NOT_USER_COMMENT);
+
+
+    }
+
+    public ResponseEntity<MessageResponseDto> likeBoard(Long id, User user) {
+        Board board = findBoard(id);
+        Optional<Like> like = likeRepository.findByUserIdAndBoardId(user.getId(), id);
+        if (like.isEmpty()) {
+            likeRepository.save(new Like(user, board));
+            MessageResponseDto message = new MessageResponseDto(HttpStatus.OK.value(), " 게시물 좋아요 성공" );
+            return ResponseEntity.status(200).body(message);
+        }
+        likeRepository.delete(like.get());
+        return ResponseEntity.status(200).body(new MessageResponseDto(HttpStatus.OK.value(), " 게시물 좋아요 취소" ));
     }
 
     // DB에서 찾기
     private Board findBoard(Long id) {
-        return boardRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("선택한 게시글이 없습니다."));
+        return boardRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_BOARD));
     }
+
 }
+

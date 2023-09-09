@@ -1,15 +1,22 @@
 package com.sparta.blog.jwt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.blog.dto.MessageResponseDto;
 import com.sparta.blog.entity.UserRoleEnum;
+import com.sparta.blog.exception.CustomException;
+import com.sparta.blog.exception.ErrorCode;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
@@ -62,6 +69,7 @@ public class JwtUtil {
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
             return bearerToken.substring(7);
         }
+        log.error("토큰토큰없냐없냐");
         return null;
     }
 

@@ -9,8 +9,8 @@ import java.util.Optional;
 
 public interface BoardRepository extends JpaRepository<Board, Long> {
     List<Board> findAllByOrderByModifiedAtDesc();
-    List<Board> findAllByContentsContainsOrderByModifiedAtDesc(String keyword);
     Optional<Board> findBoardById(Long id);
 
     List<Board> findAllByUser(User user);
+
 }

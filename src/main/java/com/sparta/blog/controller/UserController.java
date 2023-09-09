@@ -1,5 +1,6 @@
 package com.sparta.blog.controller;
 
+import com.sparta.blog.dto.MessageResponseDto;
 import com.sparta.blog.dto.SignupRequestDto;
 import com.sparta.blog.repository.UserRepository;
 import com.sparta.blog.service.UserService;
@@ -28,13 +29,13 @@ public class UserController {
 
     @PostMapping("/auth/signup")
     // 회원가입 하는 코드
-    public ResponseEntity<String> signup(@Valid @RequestBody SignupRequestDto requestDto, BindingResult bindingResult) {
+    public ResponseEntity<MessageResponseDto> signup(@Valid @RequestBody SignupRequestDto requestDto, BindingResult bindingResult) {
         // Validation 예외처리
         List<FieldError> fieldErrors = bindingResult.getFieldErrors();
         if (fieldErrors.size() > 0) {
             for (FieldError fieldError : bindingResult.getFieldErrors()) {
                 log.error(fieldError.getField() + " 필드 : " + fieldError.getDefaultMessage());
-                return new ResponseEntity<>("상태코드 : " + HttpStatus.BAD_REQUEST.value() + ", 메세지 : " + fieldError.getDefaultMessage(), HttpStatus.BAD_REQUEST);
+                throw new IllegalArgumentException(fieldError.getDefaultMessage());
             }
         }
         return userService.signup(requestDto);

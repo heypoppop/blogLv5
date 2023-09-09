@@ -2,6 +2,7 @@ package com.sparta.blog.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.blog.dto.LoginRequestDto;
+import com.sparta.blog.dto.MessageResponseDto;
 import com.sparta.blog.entity.UserRoleEnum;
 import com.sparta.blog.jwt.JwtUtil;
 import jakarta.servlet.FilterChain;
@@ -51,23 +52,20 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, token);
 
         // 로그인 성공 메세지 전달
-        response.setContentType("text/plain");
-        response.setCharacterEncoding("UTF-8");
-        String massage = "로그인 성공";
-        response.getWriter().write("상태코드 : " + response.getStatus() + ", 메세지 : " + massage);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("utf-8");
+        MessageResponseDto message = new MessageResponseDto(200, "로그인 성공");
+        response.getWriter().write(new ObjectMapper().writeValueAsString(message));
     }
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException {
 
         // 오류 메세지 전달
-        String errorMessage = failed.getMessage();
-        response.setCharacterEncoding("UTF-8");
-        response.setContentType("text/plain");
-        response.setStatus(401);
-        response.getWriter().write("상태코드 : " + response.getStatus() + ", 메세지 : " + errorMessage);
-
-
+        response.setContentType("application/json");
+        response.setCharacterEncoding("utf-8");
+        MessageResponseDto message = new MessageResponseDto(401, "로그인 실패");
+        response.getWriter().write(new ObjectMapper().writeValueAsString(message));
     }
 
 }

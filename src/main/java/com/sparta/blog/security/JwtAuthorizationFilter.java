@@ -1,6 +1,10 @@
 package com.sparta.blog.security;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.blog.dto.MessageResponseDto;
+import com.sparta.blog.exception.CustomException;
+import com.sparta.blog.exception.ErrorCode;
 import com.sparta.blog.jwt.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -38,6 +42,10 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
             if (!jwtUtil.validateToken(tokenValue)) {
                 log.error("Token Error");
+                res.setContentType("application/json");
+                res.setCharacterEncoding("utf-8");
+                MessageResponseDto message = new MessageResponseDto(403, "토큰 님께서 집을 나가셨습니다.");
+                res.getWriter().write(new ObjectMapper().writeValueAsString(message));
                 return;
             }
 
@@ -47,9 +55,23 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 setAuthentication(info.getSubject());
             } catch (Exception e) {
                 log.error(e.getMessage());
+                res.setContentType("application/json");
+                res.setCharacterEncoding("utf-8");
+                MessageResponseDto message = new MessageResponseDto(403, "토큰 님께서 집을 나가셨습니다.");
+                res.getWriter().write(new ObjectMapper().writeValueAsString(message));
                 return;
             }
         }
+
+        // 매니저님께 여쭤보기 (필터에서 클라이언트로 반환 어떻게 하는지??)
+//        if (tokenValue == null) {
+//            log.error("Token Error");
+//            res.setContentType("application/json");
+//            res.setCharacterEncoding("utf-8");
+//            MessageResponseDto message = new MessageResponseDto(403, "토큰 님께서 집을 나가셨습니다.");
+//            res.getWriter().write(new ObjectMapper().writeValueAsString(message));
+//            return;
+//        }
 
         filterChain.doFilter(req, res);
     }
