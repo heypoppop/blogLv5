@@ -69,6 +69,7 @@ public class JwtUtil {
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
             return bearerToken.substring(7);
         }
+
         log.error("토큰토큰없냐없냐");
         return null;
     }

@@ -38,7 +38,19 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         String tokenValue = jwtUtil.getJwtFromHeader(req);
 
+
+        // 매니저님께 물어보기
+//        if (tokenValue == null) {
+//            log.error("Token Error");
+//            res.setContentType("application/json");
+//            res.setCharacterEncoding("utf-8");
+//            MessageResponseDto message = new MessageResponseDto(403, "토큰 님께서 집을 나가셨습니다.");
+//            res.getWriter().write(new ObjectMapper().writeValueAsString(message));
+//            return;
+//        }
+
         if (StringUtils.hasText(tokenValue)) {
+
 
             if (!jwtUtil.validateToken(tokenValue)) {
                 log.error("Token Error");
@@ -63,15 +75,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             }
         }
 
-        // 매니저님께 여쭤보기 (필터에서 클라이언트로 반환 어떻게 하는지??)
-//        if (tokenValue == null) {
-//            log.error("Token Error");
-//            res.setContentType("application/json");
-//            res.setCharacterEncoding("utf-8");
-//            MessageResponseDto message = new MessageResponseDto(403, "토큰 님께서 집을 나가셨습니다.");
-//            res.getWriter().write(new ObjectMapper().writeValueAsString(message));
-//            return;
-//        }
+
 
         filterChain.doFilter(req, res);
     }
