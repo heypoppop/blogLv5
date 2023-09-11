@@ -5,10 +5,7 @@ import com.sparta.blog.dto.MessageResponseDto;
 import com.sparta.blog.entity.*;
 import com.sparta.blog.exception.CustomException;
 import com.sparta.blog.exception.ErrorCode;
-import com.sparta.blog.repository.BoardRepository;
-import com.sparta.blog.repository.CommentRepository;
-import com.sparta.blog.repository.LikeRepository;
-import com.sparta.blog.repository.UserRepository;
+import com.sparta.blog.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +19,7 @@ import java.util.Optional;
 public class CommentService {
     private final CommentRepository commentRepository;
     private final BoardRepository boardRepository;
-    private final LikeRepository likeRepository;
+    private final CommentLikeRepository commentLikeRepository;
 
     // 댓글 작성
     public ResponseEntity<MessageResponseDto> createComment(CommentRequestDto commentRequestDto, User user) {
@@ -65,14 +62,14 @@ public class CommentService {
 
     public ResponseEntity<MessageResponseDto> likeComment(Long id, User user) {
         Comment comment = findComment(id);
-        Optional<Like> like = likeRepository.findByUserIdAndBoardId(user.getId(), id);
+        Optional<CommentLike> like = commentLikeRepository.findByUserIdAndCommentId(user.getId(), id);
         if (like.isEmpty()) {
-            likeRepository.save(new Like(user, comment.getBoard(), comment));
-            MessageResponseDto message = new MessageResponseDto(HttpStatus.OK.value(), " 게시물 좋아요 성공" );
+            commentLikeRepository.save(new CommentLike(user, comment));
+            MessageResponseDto message = new MessageResponseDto(HttpStatus.OK.value(), " 댓글 좋아요 성공" );
             return ResponseEntity.status(200).body(message);
         }
-        likeRepository.delete(like.get());
-        return ResponseEntity.status(200).body(new MessageResponseDto(HttpStatus.OK.value(), " 게시물 좋아요 취소" ));
+        commentLikeRepository.delete(like.get());
+        return ResponseEntity.status(200).body(new MessageResponseDto(HttpStatus.OK.value(), " 댓글 좋아요 취소" ));
     }
 
     // DB에서 찾기

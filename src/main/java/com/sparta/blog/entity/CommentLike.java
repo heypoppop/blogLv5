@@ -8,10 +8,9 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name = "likes")
+@Table(name = "commentLike")
 @NoArgsConstructor
-public class Like {
-
+public class CommentLike {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,21 +21,11 @@ public class Like {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "board_id", nullable = true)
-    private Board board;
-
-    @ManyToOne
-    @JoinColumn(name = "comment_id", nullable = true)
+    @JoinColumn(name = "comment_id", nullable = false)
     private Comment comment;
 
-    public Like(User user, Board board, Comment comment) {
+    public CommentLike(User user, Comment comment) {
         this.user = user;
-        this.board = board;
         this.comment = comment;
-    }
-
-    public Like(User user, Board board) {
-        this.user = user;
-        this.board = board;
     }
 }

@@ -25,7 +25,6 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-    private final UserRepository userRepository;
 
     @PostMapping("/auth/signup")
     // 회원가입 하는 코드

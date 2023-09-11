@@ -3,14 +3,11 @@ package com.sparta.blog.service;
 import com.sparta.blog.dto.BoardRequestDto;
 import com.sparta.blog.dto.BoardResponseDto;
 import com.sparta.blog.dto.MessageResponseDto;
-import com.sparta.blog.entity.Board;
-import com.sparta.blog.entity.Like;
-import com.sparta.blog.entity.User;
-import com.sparta.blog.entity.UserRoleEnum;
+import com.sparta.blog.entity.*;
 import com.sparta.blog.exception.CustomException;
 import com.sparta.blog.exception.ErrorCode;
+import com.sparta.blog.repository.BoardLikeRepository;
 import com.sparta.blog.repository.BoardRepository;
-import com.sparta.blog.repository.LikeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +22,7 @@ import java.util.Optional;
 public class BoardService {
 
     private final BoardRepository boardRepository;
-    private final LikeRepository likeRepository;
+    private final BoardLikeRepository boardLikeRepository;
 
 
     // 전체 조회
@@ -77,13 +74,13 @@ public class BoardService {
 
     public ResponseEntity<MessageResponseDto> likeBoard(Long id, User user) {
         Board board = findBoard(id);
-        Optional<Like> like = likeRepository.findByUserIdAndBoardId(user.getId(), id);
+        Optional<BoardLike> like = boardLikeRepository.findByUserIdAndBoardId(user.getId(), id);
         if (like.isEmpty()) {
-            likeRepository.save(new Like(user, board));
+            boardLikeRepository.save(new BoardLike(user, board));
             MessageResponseDto message = new MessageResponseDto(HttpStatus.OK.value(), " 게시물 좋아요 성공" );
             return ResponseEntity.status(200).body(message);
         }
-        likeRepository.delete(like.get());
+        boardLikeRepository.delete(like.get());
         return ResponseEntity.status(200).body(new MessageResponseDto(HttpStatus.OK.value(), " 게시물 좋아요 취소" ));
     }
 

@@ -36,7 +36,7 @@ public class Board extends Timestamped{
 
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
-    private List<Like> likessList = new ArrayList<>();
+    private List<BoardLike> likessList = new ArrayList<>();
 
     public Board(BoardRequestDto boardrequestDto, User user) {
         this.contents = boardrequestDto.getContents();
