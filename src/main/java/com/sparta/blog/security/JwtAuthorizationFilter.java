@@ -33,21 +33,17 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         this.userDetailsService = userDetailsService;
     }
 
+
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws ServletException, IOException {
 
         String tokenValue = jwtUtil.getJwtFromHeader(req);
 
-
-        // 매니저님께 물어보기
-//        if (tokenValue == null) {
-//            log.error("Token Error");
-//            res.setContentType("application/json");
-//            res.setCharacterEncoding("utf-8");
-//            MessageResponseDto message = new MessageResponseDto(403, "토큰 님께서 집을 나가셨습니다.");
-//            res.getWriter().write(new ObjectMapper().writeValueAsString(message));
-//            return;
-//        }
+        if ("/api/auth/login".equals(req.getRequestURI()) || "/api/auth/signup".equals(req.getRequestURI())) {
+            // 토큰이 비어 있을 때 예외 처리를 하지 않도록 조건문 추가
+            filterChain.doFilter(req, res);
+            return;
+        }
 
         if (StringUtils.hasText(tokenValue)) {
 
