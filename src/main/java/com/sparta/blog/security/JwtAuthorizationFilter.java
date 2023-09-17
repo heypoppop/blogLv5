@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.blog.dto.MessageResponseDto;
 import com.sparta.blog.exception.CustomException;
 import com.sparta.blog.exception.ErrorCode;
+import com.sparta.blog.exception.RestApiException;
 import com.sparta.blog.jwt.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -39,15 +40,25 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         String tokenValue = jwtUtil.getJwtFromHeader(req);
 
-        if ("/api/auth/login".equals(req.getRequestURI()) || "/api/auth/signup".equals(req.getRequestURI())) {
+        if ("/api/auth/login".equals(req.getRequestURI()) ||
+                "/api/auth/signup".equals(req.getRequestURI()) ||
+                req.getRequestURI().startsWith("/v3/") ||
+                req.getRequestURI().startsWith("/swagger-ui")) {
             // 토큰이 비어 있을 때 예외 처리를 하지 않도록 조건문 추가
             filterChain.doFilter(req, res);
             return;
         }
 
+        if( tokenValue == null || tokenValue.equals("null")) {
+            res.setContentType("application/json");
+            res.setCharacterEncoding("UTF-8");
+            res.setStatus(403);
+            RestApiException restApiException = new RestApiException(403, "토큰이 유효하지 않습니다.");
+            res.getWriter().write(new ObjectMapper().writeValueAsString(restApiException));
+            return;
+        }
+
         if (StringUtils.hasText(tokenValue)) {
-
-
             if (!jwtUtil.validateToken(tokenValue)) {
                 log.error("Token Error");
                 res.setContentType("application/json");
@@ -56,9 +67,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 res.getWriter().write(new ObjectMapper().writeValueAsString(message));
                 return;
             }
-
             Claims info = jwtUtil.getUserInfoFromToken(tokenValue);
-
             try {
                 setAuthentication(info.getSubject());
             } catch (Exception e) {

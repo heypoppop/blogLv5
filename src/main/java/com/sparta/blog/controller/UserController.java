@@ -4,6 +4,7 @@ import com.sparta.blog.dto.MessageResponseDto;
 import com.sparta.blog.dto.SignupRequestDto;
 import com.sparta.blog.repository.UserRepository;
 import com.sparta.blog.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-
+    @Operation(hidden = true)
     @PostMapping("/auth/signup")
     // 회원가입 하는 코드
     public ResponseEntity<MessageResponseDto> signup(@Valid @RequestBody SignupRequestDto requestDto, BindingResult bindingResult) {
